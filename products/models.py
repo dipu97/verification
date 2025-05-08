@@ -17,17 +17,20 @@ class Product(models.Model):
 
 
 class ProductUnit(models.Model):
-
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="units")
-    serial_number = models.CharField(max_length=100, unique=True, blank=False,null=False)
+    serial_number = models.CharField(max_length=100, unique=True)
     is_registered = models.BooleanField(default=False)
     qr_code = models.ImageField(upload_to='qr_codes/', blank=True)
+
+    secret_code = models.UUIDField(default=uuid.uuid4, editable=False)
+    usage_count = models.PositiveIntegerField(default=0)
+    max_uses = models.PositiveIntegerField(default=5)
 
     def save(self, *args, **kwargs):
         if not self.serial_number:
             self.serial_number = f"{self.product.id}-{uuid.uuid4().hex[:10].upper()}"
 
-        verify_url = f"https://yourdomain.com/verify/{self.serial_number}/"
+        verify_url = f"https://yourdomain.com/verify/{self.serial_number}/?code={self.secret_code}"
         qr_img = qrcode.make(verify_url)
         buffer = BytesIO()
         qr_img.save(buffer, format='PNG')
