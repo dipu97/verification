@@ -3,7 +3,7 @@
 import csv
 from django.http import HttpResponse
 from django.contrib import admin
-from .models import Product, ProductUnit
+from .models import Product, ProductUnit, VerificationLog
 
 
 @admin.register(Product)
@@ -33,3 +33,6 @@ class ProductAdmin(admin.ModelAdmin):
         return response
 
     download_qr_codes_csv.short_description = "Download QR Codes as CSV"
+
+admin.site.register(ProductUnit)
+admin.site.register(VerificationLog)
